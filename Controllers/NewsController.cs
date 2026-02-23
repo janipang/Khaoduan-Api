@@ -25,6 +25,20 @@ public class NewsController(IDatabaseService db) : ControllerBase
         return Ok(news);
     }
 
+    [HttpPost]
+    public async Task<ActionResult<News>> PostNews(News news)
+    {
+        var newsWithId = await db.AddNewsAsync(news);
+        return Ok(newsWithId);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<News>> PutNews(int id, News news)
+    {
+        var newsWithId = await db.UpdateNewsAsync(id, news);
+        return Ok(newsWithId);
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult<News>> DeleteNews(int id)
     {

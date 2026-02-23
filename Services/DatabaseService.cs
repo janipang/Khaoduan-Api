@@ -1,4 +1,5 @@
 using System.Data;
+using System.Text.Json;
 using khaoduan_api.Data;
 using khaoduan_api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,11 @@ public class DatabaseService : IDatabaseService
     }
 
 
-    public Task<List<News>> AddNewsAsync(News news)
+    public async Task<News> AddNewsAsync(News news)
     {
-        throw new NotImplementedException();
+        _context.News.Add(news);
+        await _context.SaveChangesAsync();
+        return news;
     }
 
     public async Task<bool> DeleteNewsAsync(int id)
@@ -36,8 +39,11 @@ public class DatabaseService : IDatabaseService
         .FromSqlRaw("SELECT * FROM News WHERE Id = {0}", id)
         .FirstOrDefaultAsync();
 
-    public Task<bool> UpdateNewsAsync(int id, News news)
+    public async Task<bool> UpdateNewsAsync(int id, News news)
     {
-        throw new NotImplementedException();
+        var sth = await _context.Database
+        .ExecuteSqlRawAsync(
+            "UPDATE News SET Title = {1}, Content = {2}, Publisher = {3}, Status = {4}, PublishedTime = {5}, LastEdittedTime = {6}, Keywords = {7}, Tags = {8}, Share = {9} WHERE id = {0}", id, news.Title, news.Content, news.Publisher, news.Status, news.PublishedTime, news.LastEdittedTime, JsonSerializer.Serialize(news.Keywords), JsonSerializer.Serialize(news.Tags), news.Share);
+        return sth > 0;
     }
 }

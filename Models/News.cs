@@ -2,7 +2,7 @@ namespace khaoduan_api.Models;
 
 public class News
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Title { get; set; }
     public required string Content { get; set; }
     public required string Publisher { get; set; }
