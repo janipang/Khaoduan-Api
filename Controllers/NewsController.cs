@@ -1,7 +1,7 @@
 using System.Net.Sockets;
 using khaoduan_api.Models;
 using khaoduan_api.Services;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace khaoduan_api.Controllers;
@@ -10,10 +10,12 @@ namespace khaoduan_api.Controllers;
 [Route("[controller]")]
 public class NewsController(IDatabaseService db) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<News>>> GetNews()
         => await db.GetNewsAsync();
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<News>> GetNewsById(int id)
     {
@@ -25,6 +27,7 @@ public class NewsController(IDatabaseService db) : ControllerBase
         return Ok(news);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<News>> PostNews(News news)
     {
@@ -32,6 +35,7 @@ public class NewsController(IDatabaseService db) : ControllerBase
         return Ok(newsWithId);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<ActionResult<News>> PutNews(int id, News news)
     {
@@ -39,6 +43,7 @@ public class NewsController(IDatabaseService db) : ControllerBase
         return Ok(newsWithId);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult<News>> DeleteNews(int id)
     {

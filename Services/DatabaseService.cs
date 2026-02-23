@@ -46,4 +46,7 @@ public class DatabaseService : IDatabaseService
             "UPDATE News SET Title = {1}, Content = {2}, Publisher = {3}, Status = {4}, PublishedTime = {5}, LastEdittedTime = {6}, Keywords = {7}, Tags = {8}, Share = {9} WHERE id = {0}", id, news.Title, news.Content, news.Publisher, news.Status, news.PublishedTime, news.LastEdittedTime, JsonSerializer.Serialize(news.Keywords), JsonSerializer.Serialize(news.Tags), news.Share);
         return sth > 0;
     }
+
+    // public async Task<Account> GetAccountAsync(string username)
+    //     => await _context.Accounts.FromSqlRaw("SELECT * FROM News WHERE 1 = 1");
 }
