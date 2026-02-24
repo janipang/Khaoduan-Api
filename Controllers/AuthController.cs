@@ -1,6 +1,8 @@
+using System.Data.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using khaoduan_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -10,22 +12,26 @@ namespace khaoduan_api.Controllers;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
+    private readonly IDatabaseService _db;
     private readonly IConfiguration _config;
 
-    public AuthController(IConfiguration config)
+    public AuthController(IDatabaseService db, IConfiguration config)
     {
+        _db = db;
         _config = config;
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // TODO: เช็ค user/password จาก DB จริงๆ
-        if (request.Username != "admin" || request.Password != "1234")
-            return Unauthorized();
+        var account = await _db.GetAccountAsync(request.Username);
+        if (account is not null && account.Password == request.Password)
+        {
+            var token = GenerateToken(request.Username);
+            return Ok(new { token });
+        }
 
-        var token = GenerateToken(request.Username);
-        return Ok(new { token });
+        return Unauthorized();
     }
 
     private string GenerateToken(string username)
@@ -41,8 +47,8 @@ public class AuthController : ControllerBase
         };
 
         var token = new JwtSecurityToken(
-        issuer: jwtConfig["Issuer"],
-        audience: audiences[0],
+            issuer: jwtConfig["Issuer"],
+            audience: audiences[0],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtConfig["TokenValidityMins"]!)),
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)

@@ -10,5 +10,5 @@ public interface IDatabaseService
     Task<News> AddNewsAsync(News news);
     Task<bool> UpdateNewsAsync(int id, News news);
     Task<bool> DeleteNewsAsync(int id);
-    // Task<Account> GetAccountAsync(string username); 
+    Task<Account?> GetAccountAsync(string username); 
 }

@@ -47,6 +47,8 @@ public class DatabaseService : IDatabaseService
         return sth > 0;
     }
 
-    // public async Task<Account> GetAccountAsync(string username)
-    //     => await _context.Accounts.FromSqlRaw("SELECT * FROM News WHERE 1 = 1");
+    public async Task<Account?> GetAccountAsync(string username)
+        => await _context.Accounts
+        .FromSqlRaw("SELECT * FROM Accounts WHERE username = {0}", username)
+        .FirstOrDefaultAsync();
 }
