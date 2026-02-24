@@ -21,14 +21,15 @@ public class FileController : ControllerBase
         if (file.Length == 0) return BadRequest("No file");
 
         var uploadPath = _config["Upload:Path"]!;
+        var publicPath = _config["Upload:PublicPath"]!;
+
         Directory.CreateDirectory(uploadPath);
 
         var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-        var fullPath = Path.Combine(uploadPath, fileName);
 
-        using var stream = System.IO.File.Create(fullPath);
+        using var stream = System.IO.File.Create(Path.Combine(uploadPath, fileName));
         await file.CopyToAsync(stream);
 
-        return Ok(new { path = fullPath });
+        return Ok(new { path = Path.Combine(publicPath, fileName) });
     }
 }
