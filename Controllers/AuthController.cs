@@ -1,10 +1,11 @@
-using System.Data.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using khaoduan_api.Models;
 using khaoduan_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using BC = BCrypt.Net.BCrypt; // Alias for clarity
 
 namespace khaoduan_api.Controllers;
 
@@ -25,13 +26,46 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var account = await _db.GetAccountAsync(request.Username);
-        if (account is not null && account.Password == request.Password)
+        if (account is not null && BC.Verify(request.Password, account.Password))
         {
             var token = GenerateToken(request.Username);
-            return Ok(new { token });
+            return Ok(new
+            {
+                username = request.Username,
+                token
+            });
         }
 
-        return Unauthorized();
+        return Unauthorized(new { message = "Invalid username or password" });
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] LoginRequest request)
+    {
+        var existing = await _db.GetAccountAsync(request.Username);
+        if (existing != null)
+        {
+            return BadRequest(new { message = "Username already exists" });
+        }
+        
+
+        string hashedPassword = BC.HashPassword(request.Password);
+        var account = new Account
+        {
+            Username = request.Username,
+            Password = hashedPassword,
+            Status = "active"
+        };
+
+        await _db.CreateAccountAsync(account);
+
+        var token = GenerateToken(request.Username);
+
+        return Ok(new
+        {
+            username = request.Username,
+            accesstoken = token
+        });
     }
 
     private string GenerateToken(string username)

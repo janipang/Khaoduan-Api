@@ -51,4 +51,12 @@ public class DatabaseService : IDatabaseService
         => await _context.Accounts
         .FromSqlRaw("SELECT * FROM Accounts WHERE username = {0}", username)
         .FirstOrDefaultAsync();
+
+    public async Task<Account?> CreateAccountAsync(Account account)
+    {
+        
+        _context.Accounts.Add(account);
+        await _context.SaveChangesAsync();
+        return account;
+    }
 }
