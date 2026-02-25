@@ -24,7 +24,7 @@ public class NewsController(IDatabaseService db) : ControllerBase
         {
             return NotFound("News with id = '' not found");
         }
-        return Ok(news);
+        return Ok(news.Reverse());
     }
 
     [Authorize]
