@@ -13,7 +13,11 @@ public class NewsController(IDatabaseService db) : ControllerBase
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<News>>> GetNews([FromQuery] string? publisher, [FromQuery] string[]? tags, [FromQuery] string[]? keywords)
-        => await db.GetNewsAsync(publisher, tags, keywords);
+    {
+        var news = await db.GetNewsAsync(publisher, tags, keywords);
+        var sortedNews = news.OrderByDescending(n => n.PublishedTime);
+        return Ok(sortedNews);
+    }
 
     [AllowAnonymous]
     [HttpGet("{id}")]
@@ -24,7 +28,7 @@ public class NewsController(IDatabaseService db) : ControllerBase
         {
             return NotFound("News with id = '' not found");
         }
-        return Ok(news.Reverse());
+        return Ok(news);
     }
 
     [Authorize]
