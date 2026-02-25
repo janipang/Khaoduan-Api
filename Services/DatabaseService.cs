@@ -29,10 +29,29 @@ public class DatabaseService : IDatabaseService
         return rows > 0;
     }
 
-    public async Task<List<News>> GetNewsAsync()
-      => await _context.News
-        .FromSqlRaw("SELECT * FROM News WHERE 1 = 1")
-        .ToListAsync();
+    public async Task<List<News>> GetNewsAsync(string? publisher = null, string[]? tags = null, string[]? keywords = null)
+    {
+        var query = _context.News.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(publisher))
+        {
+            query = query.Where(n => n.Publisher == publisher);
+        }
+
+        var result = await query.ToListAsync();
+
+        if (tags != null && tags.Length > 0)
+        {
+            result = result.Where(n => n.Tags != null && n.Tags.Any(t => tags.Contains(t))).ToList();
+        }
+
+        if (keywords != null && keywords.Length > 0)
+        {
+            result = result.Where(n => n.Keywords != null && n.Keywords.Any(k => keywords.Contains(k))).ToList();
+        }
+
+        return result;
+    }
 
     public async Task<News?> GetNewsBYIdAsync(int id)
         => await _context.News

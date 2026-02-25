@@ -12,8 +12,8 @@ public class NewsController(IDatabaseService db) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<List<News>>> GetNews()
-        => await db.GetNewsAsync();
+    public async Task<ActionResult<List<News>>> GetNews([FromQuery] string? publisher, [FromQuery] string[]? tags, [FromQuery] string[]? keywords)
+        => await db.GetNewsAsync(publisher, tags, keywords);
 
     [AllowAnonymous]
     [HttpGet("{id}")]

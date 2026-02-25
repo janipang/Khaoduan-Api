@@ -64,7 +64,7 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             username = request.Username,
-            accesstoken = token
+             token
         });
     }
 
