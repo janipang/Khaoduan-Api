@@ -20,4 +20,4 @@ COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "khaoduan-api.dll"]
 
 # docker build -t khaoduan-api . 
-# docker run -p 8080:8080 -d -v D:/Code/Project/Web/khaoduan-api/Storage:/app/atorage --name khaoduan-container khaoduan-api
+# docker run -p 8080:8080 -d -v D:/Code/Project/Web/khaoduan-api/Storage:/app/storage --name khaoduan-container khaoduan-api

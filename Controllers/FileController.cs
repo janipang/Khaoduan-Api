@@ -21,7 +21,6 @@ public class FileController : ControllerBase
         if (file.Length == 0) return BadRequest("No file");
 
         var uploadPath = _config["Upload:Path"]!;
-        var publicPath = _config["Upload:PublicPath"]!;
 
         Directory.CreateDirectory(uploadPath);
 
@@ -30,6 +29,24 @@ public class FileController : ControllerBase
         using var stream = System.IO.File.Create(Path.Combine(uploadPath, fileName));
         await file.CopyToAsync(stream);
 
-        return Ok(new { path = Path.Combine(publicPath, fileName) });
+        return Ok(new { filename = fileName });
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{filename}")]
+    public IActionResult GetFile(string filename)
+    {
+        var uploadPath = _config["Upload:Path"]!;
+        var path = Path.Combine(uploadPath, filename);
+        
+        if (!System.IO.File.Exists(path)) return NotFound();
+
+        var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(path, out string contentType))
+        {
+            contentType = "application/octet-stream";
+        }
+
+        return PhysicalFile(path, contentType);
     }
 }
